@@ -1,0 +1,265 @@
+23. Develop a Python application to implement data generalization on the "Sales" dataset 
+by summarizing sales by region and product category.
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the dataset
+sales_data = pd.read_csv("supermarket_sales - Sheet1.csv")  # Update the file path accordingly
+
+# Data preprocessing (if needed)
+
+# Derive Region from City
+sales_data['Region'] = sales_data['City'].apply(lambda x: x.split(',')[0])
+
+# Data generalization
+sales_summary = sales_data.groupby(['Region', 'Product line']).agg({
+    'Total': 'sum',  # Sum of total sales
+    'Quantity': 'sum',  # Sum of quantity sold
+    'Rating': 'mean'  # Average rating
+}).reset_index()
+
+# Display summarized results
+print(sales_summary)
+
+
+# Summary of Numeric Variables
+numeric_summary = sales_data.describe()
+
+# Summary of Categorical Variables
+categorical_summary = {}
+for column in sales_data.select_dtypes(include=['object']):
+    categorical_summary[column] = sales_data[column].value_counts()
+
+# Display summaries
+print("Summary of Numeric Variables:")
+print(numeric_summary)
+
+print("\nSummary of Categorical Variables:")
+for column, summary in categorical_summary.items():
+    print(f"\n{column}:")
+    print(summary)
+
+
+# Summary of Quantity by City
+city_quantity_summary = sales_data.groupby('City')['Quantity'].agg(['sum', 'mean', 'median', 'min', 'max', 'count']).reset_index()
+
+# Display summarized results
+print("Summary of Quantity by City:")
+print(city_quantity_summary)
+
+
+
+# Calculate total quantity sold by city
+city_quantity = sales_data.groupby('City')['Quantity'].sum().reset_index()
+
+# Sort cities by total quantity sold
+city_quantity_sorted = city_quantity.sort_values(by='Quantity', ascending=False)
+
+# Visualize the data
+plt.figure(figsize=(10, 6))
+plt.bar(city_quantity_sorted['City'], city_quantity_sorted['Quantity'], color='skyblue')
+plt.xlabel('City')
+plt.ylabel('Total Quantity Sold')
+plt.title('Total Quantity Sold by City')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+
+
+25.Create an R script to summarize the "Student Performance" dataset by calculating the 
+average grades by school and gender. 
+
+
+# Load the required libraries
+library(dplyr)
+library(ggplot2)
+
+# Read the dataset
+studentPer_data <- read.csv("C:/Users/rushi/OneDrive/Desktop/StudentPer.csv")
+
+# Calculate average grades by school and gender
+summary_data <- studentPer_data %>%
+  group_by(School, Gender) %>%
+  summarise(
+    Avg_Physics = mean(Physics, na.rm = TRUE),
+    Avg_Chemistry = mean(Chemistry, na.rm = TRUE),
+    Avg_Math = mean(Math, na.rm = TRUE)
+  )
+
+# Print the summary data
+print(summary_data)
+
+# Histogram of Physics Grades
+ggplot(studentPer_data, aes(x = Physics)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Physics Grades",
+       x = "Physics Grade", y = "Frequency")
+
+# Line graph of Chemistry Grades by School and Gender
+ggplot(summary_data, aes(x = School, y = Avg_Chemistry, group = Gender, color = Gender)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Average Chemistry Grades by School and Gender",
+       x = "School", y = "Average Chemistry Grade")
+
+# Scatter plot of Math Grades by Weekly Study Hours
+ggplot(studentPer_data, aes(x = Weekly_Study_Hours, y = Math, color = Gender)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Scatter Plot of Math Grades vs Weekly Study Hours",
+       x = "Weekly Study Hours", y = "Math Grade")
+
+
+26. Implement data summarization in a Python application to generate summary statistics 
+(mean, median, standard deviation) for the "Health" dataset. 
+
+
+import pandas as pd
+from tkinter import Tk, filedialog
+
+def summarize_data(df):
+    # Compute mean, median, and standard deviation
+    summary = {
+        'Mean': df.mean(),
+        'Median': df.median(),
+        'Standard Deviation': df.std()
+    }
+    return summary
+
+def choose_file():
+    root = Tk()
+    root.withdraw()  # Hide the root window
+    file_path = filedialog.askopenfilename(title="Choose a CSV file", filetypes=[("CSV files", "*.csv")])
+    root.destroy()
+    return file_path
+
+def main():
+    # Select CSV file
+    csv_file = choose_file()
+
+    if not csv_file:
+        print("No file selected.")
+        return
+
+    # Read CSV file into DataFrame
+    try:
+        df = pd.read_csv(csv_file)
+    except FileNotFoundError:
+        print("File not found.")
+        return
+    except Exception as e:
+        print("An error occurred:", e)
+        return
+
+    # Summarize the data
+    summary = summarize_data(df)
+
+    # Display summary statistics
+    print("\nSummary Statistics:")
+    for stat, values in summary.items():
+        print(f"\n{stat}:")
+        print(values)
+
+if _name_ == "_main_":
+    main()
+
+
+
+
+
+28. Create a data summarization dashboard in a Jupyter Notebook to visualize the 
+summary of the "Online Retail" dataset. 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+import ipywidgets as widgets
+from IPython.display import display
+from io import StringIO
+from tkinter import Tk, filedialog
+
+# Function to choose file using file dialog
+def choose_file():
+    root = Tk()
+    root.withdraw()  # Hide the root window
+    file_path = filedialog.askopenfilename(title="Choose a CSV file", filetypes=[("CSV files", "*.csv")])
+    root.destroy()
+    return file_path
+
+# Function to load dataset
+def load_data(file_path):
+    df = pd.read_csv(file_path)
+    return df
+
+# Function to perform data cleaning
+def clean_data(df):
+    df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'])
+    df['TotalRevenue'] = df['Quantity'] * df['UnitPrice']
+    return df
+
+# Function to generate summary statistics
+def generate_summary(df):
+    summary_stats = df.describe()
+    display(summary_stats)
+
+# Function to create visualizations
+def create_visualizations(df):
+    # Distribution of Unit Price
+    plt.figure(figsize=(10, 6))
+    sns.histplot(df['UnitPrice'], bins=50, kde=True)
+    plt.title('Distribution of Unit Price')
+    plt.xlabel('Unit Price')
+    plt.ylabel('Frequency')
+    plt.show()
+
+    # Top 10 Countries by Total Revenue
+    top_countries = df.groupby('Country')['TotalRevenue'].sum().sort_values(ascending=False).head(10)
+    fig = px.bar(top_countries, x=top_countries.index, y=top_countries.values, title='Top 10 Countries by Total Revenue')
+    fig.show()
+
+    # Monthly Revenue
+    df['Month'] = df['InvoiceDate'].dt.to_period('M')
+    monthly_revenue = df.groupby('Month')['TotalRevenue'].sum()
+    fig = px.line(monthly_revenue, x=monthly_revenue.index.to_timestamp(), y=monthly_revenue.values, title='Monthly Revenue')
+    fig.show()
+
+    # Top 10 Products by Quantity Sold
+    top_products = df.groupby('Description')['Quantity'].sum().sort_values(ascending=False).head(10)
+    fig = px.bar(top_products, x=top_products.values, y=top_products.index, orientation='h', title='Top 10 Products by Quantity Sold')
+    fig.show()
+
+# Function to display additional summary
+def display_additional_summary(df):
+    total_orders = df['InvoiceNo'].nunique()
+    print(f'Total number of orders: {total_orders}')
+
+    total_customers = df['CustomerID'].nunique()
+    print(f'Total number of customers: {total_customers}')
+
+    total_revenue = df['TotalRevenue'].sum()
+    print(f'Total revenue: £{total_revenue:,.2f}')
+
+# Button to trigger file selection
+file_button = widgets.Button(description="Choose CSV File")
+output = widgets.Output()
+
+def on_button_click(b):
+    with output:
+        output.clear_output()
+        file_path = choose_file()
+        if file_path:
+            df = load_data(file_path)
+            df_clean = clean_data(df)
+            generate_summary(df_clean)
+            create_visualizations(df_clean)
+            display_additional_summary(df_clean)
+        else:
+            print("No file selected")
+
+file_button.on_click(on_button_click)
+
+display(file_button, output)
