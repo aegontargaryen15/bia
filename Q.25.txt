@@ -1,0 +1,40 @@
+# Load the required libraries
+install.packages("ggplot2")
+install.packages("dplyr")
+library(dplyr)
+library(ggplot2)
+
+# Read the dataset
+studentPer_data <- read.csv(file.choose())
+
+# Calculate average grades by school and gender
+summary_data <- studentPer_data %>%
+  group_by(School, Gender) %>%
+  summarise(
+    Avg_Physics = mean(Physics, na.rm = TRUE),
+    Avg_Chemistry = mean(Chemistry, na.rm = TRUE),
+    Avg_Math = mean(Math, na.rm = TRUE)
+  )
+
+# Print the summary data
+print(summary_data)
+
+# Histogram of Physics Grades
+ggplot(studentPer_data, aes(x = Physics)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Physics Grades",
+       x = "Physics Grade", y = "Frequency")
+
+# Line graph of Chemistry Grades by School and Gender
+ggplot(summary_data, aes(x = School, y = Avg_Chemistry, group = Gender, color = Gender)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Average Chemistry Grades by School and Gender",
+       x = "School", y = "Average Chemistry Grade")
+
+# Scatter plot of Math Grades by Weekly Study Hours
+ggplot(studentPer_data, aes(x = Weekly_Study_Hours, y = Math, color = Gender)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Scatter Plot of Math Grades vs Weekly Study Hours",
+       x = "Weekly Study Hours", y = "Math Grade")
